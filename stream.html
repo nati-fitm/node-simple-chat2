@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>iPhone Tweet Stream</title>
+  <script type="text/javascript" src="/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    .box{
+      position: fixed;
+      left: 0px;
+      top: 0px;
+    }
+    #chatbox{
+      background-color: #FFFFFF;
+      padding: 5px;
+      padding-left: 8px;
+      display: none;
+      width: 210px;
+      box-shadow: 1px 1px 3px rgba(125,125,125,0.5);
+      position: fixed;
+    }
+    #msg{
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chatbox">
+    <input type="text" id="msg">
+  </div>
+  
+<script type="text/javascript">
+    var socket = new io.connect("http://localhost:8888");
+    var boxX = 0;
+    var boxY = 0;
+    socket.on('message', function(msg) {
+        console.log(msg);
+
+        var a = msg.split(':');
+
+        var msgbox = "<div class='box' style='left:"+a[0]+"px; top:"+a[1]+"px;'>"+ a[2] +"</div>";
+        $("body").append(msgbox);
+       
+    });
+
+    $('#msg').bind('keydown', function(event) {
+      if(event.keyCode == 13)
+      {
+        socket.send(boxX + ":" +  boxY + ":" +  $("#msg").val());
+        $("#msg").val("");
+        $("#chatbox").hide();
+      }
+    });
+
+    $(document).mousedown(function(event) {
+      console.log(event.pageX + " : " + event.pageY);
+      $("#chatbox").css("left", event.pageX);
+      $("#chatbox").css("top", event.pageY);
+      $("#chatbox").show();
+      $("#msg").focus();
+
+      boxX = event.pageX;
+      boxY = event.pageY;
+    });
+
+  </script>
+</body>
+</html>
